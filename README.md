@@ -34,7 +34,7 @@ Get one at [mapbox.com](https://www.mapbox.com) → Account → Tokens.
 
 **Without a token the demo still runs** against a styled fallback "map" so every
 screen and interaction works — pins, drawer, threads, sheets. Add the token to see
-the real light Mapbox map of Tel Aviv and the static mini-map previews in threads.
+the real light Mapbox map of London and the static mini-map previews in threads.
 
 ## Light vs dark map (flagged in the brief)
 
@@ -48,7 +48,7 @@ export const MAP_STYLE = 'mapbox://styles/mapbox/light-v11';
 
 ## What works (acceptance criteria)
 
-1. Loads to a Tel Aviv map with 5 pastel, event-typed pins.
+1. Loads to a London map with 5 pastel, event-typed pins.
 2. "Active · You'll be notified" status pill, top center.
 3. Drawer peeks with 2 rows + a third peeking.
 4. Drawer snaps between **peek / expanded / fullscreen** — drag the handle, or tap it

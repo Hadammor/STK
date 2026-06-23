@@ -1,13 +1,13 @@
 import type { Event } from '../types/Event';
 import type { Message } from '../types/Message';
-import { habimaEvent } from './mockEvents';
+import { featuredEvent } from './mockEvents';
 
 // Build a conversation thread for any event:
 //   1. a rich "event-card" first message
 //   2. one plain "update" bubble per Update on the event
 //   3. a closing "system" notice
-// The Habima thread (below) is the curated showcase the brief calls for, but every
-// event gets a coherent thread so any drawer row opens into a real conversation.
+// The featured thread (below) is the curated showcase, but every event gets a
+// coherent thread so any drawer row opens into a real conversation.
 export function buildThread(event: Event): Message[] {
   const messages: Message[] = [
     {
@@ -39,8 +39,8 @@ export function buildThread(event: Event): Message[] {
   return messages;
 }
 
-// The Habima Square thread — the demo's showcase conversation.
-export const habimaThread: Message[] = buildThread(habimaEvent);
+// The featured thread — the demo's showcase conversation.
+export const featuredThread: Message[] = buildThread(featuredEvent);
 
 // Canned quick replies shown at the bottom of every thread.
 export const quickReplies = ['I’m safe', 'I need help', 'Share live location'] as const;

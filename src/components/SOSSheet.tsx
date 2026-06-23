@@ -10,10 +10,11 @@ interface CallService {
   Icon: typeof Shield;
 }
 
+// UK: dial 999 (or 112) for any emergency service.
 const services: CallService[] = [
-  { label: 'Police', number: '100', Icon: Shield },
-  { label: 'Ambulance', number: '101', Icon: Ambulance },
-  { label: 'Fire', number: '102', Icon: Flame },
+  { label: 'Police', number: '999', Icon: Shield },
+  { label: 'Ambulance', number: '999', Icon: Ambulance },
+  { label: 'Fire', number: '999', Icon: Flame },
 ];
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -116,16 +117,16 @@ export function SOSSheet() {
         <div className="flex items-center gap-3 px-4 py-3">
           <MapPin size={18} className="shrink-0 text-ink2" />
           <span className="text-body text-ink">
-            9 Yitzhak Rabin Blvd, Jerusalem
+            2 Palace Green, Kensington, London W8 4QB
           </span>
         </div>
         <div className="flex items-center gap-3 px-4 py-3">
           <Phone size={18} className="shrink-0 text-ink2" />
-          <span className="text-body text-ink">+972 2 530 3155</span>
+          <span className="text-body text-ink">+44 20 7957 9500</span>
         </div>
         <div className="flex items-center gap-3 px-4 py-3">
           <Clock size={18} className="shrink-0 text-ink2" />
-          <span className="text-body text-ink">Sun–Thu · 08:00–16:00</span>
+          <span className="text-body text-ink">Mon–Thu · 09:00–16:00</span>
         </div>
       </div>
     </BottomSheet>

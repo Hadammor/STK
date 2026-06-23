@@ -36,9 +36,9 @@ export const severityTokens: Record<
   critical: { ...colors.pillCritical, label: 'Critical' },
 };
 
-// Tel Aviv — demo map center + default zoom.
-export const MAP_CENTER: [number, number] = [34.7818, 32.0853];
-export const MAP_ZOOM = 13;
+// London — demo map center + default zoom.
+export const MAP_CENTER: [number, number] = [-0.128, 51.513];
+export const MAP_ZOOM = 12.5;
 
 // Single source of truth for the map style so swapping light <-> dark is trivial.
 // Production design calls for an always-dark map; this demo uses light. (See brief §Map.)

@@ -19,8 +19,8 @@ import { HelpButton } from './HelpButton';
 const TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
 const hasToken = !!TOKEN && TOKEN.startsWith('pk.');
 
-// Bounding box for the no-token fallback projection (roughly central Tel Aviv).
-const BBOX = { lngMin: 34.76, lngMax: 34.798, latMin: 32.068, latMax: 32.098 };
+// Bounding box for the no-token fallback projection (roughly central London).
+const BBOX = { lngMin: -0.16, lngMax: -0.1, latMin: 51.49, latMax: 51.535 };
 
 interface ScreenPin {
   event: Event;
