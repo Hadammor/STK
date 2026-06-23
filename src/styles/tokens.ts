@@ -48,7 +48,7 @@ export const severityVivid: Record<Severity, string> = {
 
 // Accent colors used by the redesigned chrome (warm/neutral — no blue/green).
 export const accent = {
-  location: '#3A3A3C', // user-location dot (neutral)
+  location: '#007AFF', // user-location dot (Apple Maps blue)
   active: '#222226', // "Active" status pill (dark)
   sos: '#D14B43', // SOS (toned red)
 } as const;

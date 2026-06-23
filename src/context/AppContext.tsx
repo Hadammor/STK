@@ -87,6 +87,7 @@ interface AppContextValue {
   // Map → drawer
   selectPin: (id: string) => void;
   clearHighlight: () => void;
+  clearSelection: () => void; // tap empty map → drop the selected/circled pin
 
   // Confirm modal (frame-level so it overlays sheets)
   confirm: ConfirmConfig | null;
@@ -178,6 +179,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const clearHighlight = useCallback(() => setHighlightedEventId(null), []);
 
+  // Tapping empty map space deselects the active pin (removes the circle/outline).
+  const clearSelection = useCallback(() => {
+    setTopEventId(null);
+    setHighlightedEventId(null);
+  }, []);
+
   // Pin tap: bump the matching row to the top + highlight it, and keep the drawer
   // in the smaller (peek) state. (MapView also re-centers the map on the event.)
   const selectPin = useCallback(
@@ -241,6 +248,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     closeSettings: settings.close,
     selectPin,
     clearHighlight,
+    clearSelection,
     confirm,
     requestConfirm,
     closeConfirm,

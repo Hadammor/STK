@@ -52,6 +52,7 @@ export function MapView() {
     drawerState,
     setDrawerState,
     showToast,
+    clearSelection,
     frameH,
   } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -102,8 +103,12 @@ export function MapView() {
     });
     map.on('move', bump);
     map.on('resize', bump);
-    // Tapping the map (not a pin/control) collapses the drawer to its peek state.
-    map.on('click', () => setDrawerState('peek'));
+    // Tapping the map (not a pin/control) collapses the drawer and deselects any
+    // circled pin.
+    map.on('click', () => {
+      setDrawerState('peek');
+      clearSelection();
+    });
     // A fatal map error (e.g. WebGL context lost) also falls back.
     map.on('error', (e) => {
       const msg = String(e?.error?.message ?? '');
@@ -192,7 +197,10 @@ export function MapView() {
       ) : (
         <div
           ref={containerRef}
-          onClick={() => setDrawerState('peek')}
+          onClick={() => {
+            setDrawerState('peek');
+            clearSelection();
+          }}
           className="absolute inset-0"
           style={{
             background:
