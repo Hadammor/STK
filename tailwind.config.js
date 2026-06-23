@@ -26,7 +26,16 @@ export default {
         pill: '999px',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        sans: [
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'SF Pro Text',
+          'SF Pro Display',
+          'Inter',
+          'system-ui',
+          'Segoe UI',
+          'sans-serif',
+        ],
       },
       letterSpacing: {
         title: '-0.015em',

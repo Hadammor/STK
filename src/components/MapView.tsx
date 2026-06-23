@@ -10,6 +10,7 @@ import { StatusPill } from './StatusPill';
 import { ProfileButton } from './ProfileButton';
 import { HelpButton } from './HelpButton';
 import { CitySwitcher } from './CitySwitcher';
+import { StatusBar } from './StatusBar';
 
 const TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
 const hasToken = !!TOKEN && TOKEN.startsWith('pk.');
@@ -201,15 +202,16 @@ export function MapView() {
 
       {/* Floating chrome over the map */}
       <div className="pointer-events-none absolute inset-0 z-20">
+        <StatusBar />
         {showTopControls && (
           <>
-            <div className="absolute left-0 right-0 top-3 flex justify-center">
+            <div className="absolute left-0 right-0 top-[42px] flex justify-center">
               <StatusPill />
             </div>
-            <div className="absolute right-4 top-3">
+            <div className="absolute right-4 top-[42px]">
               <ProfileButton />
             </div>
-            <div className="absolute left-3 top-[54px]">
+            <div className="absolute left-3 top-[88px]">
               <CitySwitcher />
             </div>
           </>

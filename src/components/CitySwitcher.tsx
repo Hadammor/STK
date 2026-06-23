@@ -14,7 +14,7 @@ export function CitySwitcher() {
         type="button"
         aria-label="Change city"
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1.5 rounded-pill border border-hair bg-white px-3 py-2 text-caption font-semibold text-ink active:bg-surface"
+        className="flex items-center gap-1.5 rounded-pill border border-hair bg-white px-3 py-2 text-caption font-semibold text-ink transition-transform active:scale-95 active:bg-surface"
       >
         <Globe size={14} className="text-ink2" />
         {active.label}

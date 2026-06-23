@@ -17,8 +17,12 @@ body,
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Lead with the real Apple system font (SF Pro) so it looks native on iOS/macOS,
+     fall back to Inter elsewhere. */
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+    'Inter', system-ui, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   /* Neutral page backdrop behind the phone frame */
   background: #e7e7ea;

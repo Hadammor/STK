@@ -20,7 +20,8 @@ const snapY: Record<DrawerState, number> = {
   peek: FRAME_H * (DRAWER_SNAP.fullscreen - DRAWER_SNAP.peek),
 };
 
-const SPRING = { type: 'spring' as const, stiffness: 340, damping: 34 };
+// iOS-like sheet spring: snappy, settles cleanly without bounce.
+const SPRING = { type: 'spring' as const, stiffness: 400, damping: 38 };
 
 export function Drawer() {
   const {
@@ -128,7 +129,7 @@ export function Drawer() {
       {/* Scrollable thread list */}
       <div
         ref={scrollRef}
-        className="no-scrollbar mt-2 flex-1 overflow-y-auto px-3 pb-6"
+        className="no-scrollbar mt-2 flex-1 overflow-y-auto overscroll-contain px-3 pb-6"
       >
         <div className="flex flex-col gap-1">
           {events.map((event) => (

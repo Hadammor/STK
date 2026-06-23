@@ -18,7 +18,7 @@ function Shell() {
 
   return (
     <div
-      className="relative overflow-hidden rounded-[28px] border border-hair bg-bg"
+      className="relative select-none overflow-hidden rounded-[28px] border border-hair bg-bg"
       style={{ width: FRAME_W, height: FRAME_H }}
     >
       <MapView />

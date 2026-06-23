@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { FRAME_H } from '../styles/tokens';
 
-const SPRING = { type: 'spring' as const, stiffness: 320, damping: 32 };
+const SPRING = { type: 'spring' as const, stiffness: 400, damping: 38 };
 
 // Reusable slide-up bottom sheet with dimmed backdrop + drag-to-close.
 // Drag is started from the header so the body scrolls independently.
@@ -73,7 +73,7 @@ export function BottomSheet({
                 </button>
               </div>
             </div>
-            <div className="no-scrollbar flex-1 overflow-y-auto px-5 pb-7 pt-1">
+            <div className="no-scrollbar flex-1 overflow-y-auto overscroll-contain px-5 pb-7 pt-1">
               {children}
             </div>
           </motion.div>

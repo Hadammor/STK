@@ -78,7 +78,7 @@ export function SOSSheet() {
             type="button"
             aria-label="I need help"
             onClick={handleNeedHelp}
-            className="h-[72px] w-full rounded-xl text-[18px] font-semibold text-white active:opacity-90"
+            className="h-[72px] w-full rounded-xl text-[18px] font-semibold text-white transition-transform active:scale-[0.98] active:opacity-90"
             style={{ backgroundColor: colors.emergency }}
           >
             I need help
@@ -100,7 +100,7 @@ export function SOSSheet() {
               type="button"
               aria-label={`Call ${s.label}`}
               onClick={() => handleCall(s)}
-              className="flex flex-col items-center gap-1.5 rounded-lg border border-hair bg-white py-3 active:bg-surface"
+              className="flex flex-col items-center gap-1.5 rounded-lg border border-hair bg-white py-3 transition-transform active:scale-95 active:bg-surface"
             >
               <span className="relative">
                 <Icon size={22} strokeWidth={2} color="#000" />

@@ -12,7 +12,7 @@ import { SeverityPill } from './SeverityPill';
 const TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
 const hasToken = !!TOKEN && TOKEN.startsWith('pk.');
 
-const SPRING = { type: 'spring' as const, stiffness: 320, damping: 32 };
+const SPRING = { type: 'spring' as const, stiffness: 400, damping: 38 };
 
 // Mini map preview used inside the rich first card.
 function MiniMap({ event }: { event: Event }) {
@@ -242,7 +242,7 @@ export function EventThreadView({
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="no-scrollbar flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4"
+        className="no-scrollbar flex flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-4 py-4"
       >
         {messages.map((m) => {
           if (m.kind === 'event-card') return <RichCard key={m.id} event={event} />;
@@ -259,7 +259,7 @@ export function EventThreadView({
             key={q}
             type="button"
             onClick={() => handleQuickReply(q)}
-            className="shrink-0 whitespace-nowrap rounded-pill border border-hair bg-white px-4 py-2 text-caption font-medium text-ink active:bg-surface"
+            className="shrink-0 whitespace-nowrap rounded-pill border border-hair bg-white px-4 py-2 text-caption font-medium text-ink transition-transform active:scale-95 active:bg-surface"
           >
             {q}
           </button>
@@ -282,7 +282,7 @@ export function EventThreadView({
             if (e.key === 'Enter') handleSend();
           }}
           placeholder="Message"
-          className="h-9 min-w-0 flex-1 rounded-pill border border-hair bg-surface px-4 text-body text-ink outline-none placeholder:text-ink3"
+          className="h-9 min-w-0 flex-1 select-text rounded-pill border border-hair bg-surface px-4 text-body text-ink outline-none placeholder:text-ink3"
         />
         {draft.trim() ? (
           <button
