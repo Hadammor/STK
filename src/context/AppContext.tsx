@@ -7,7 +7,12 @@ import {
   type ReactNode,
 } from 'react';
 import type { Event } from '../types/Event';
-import { mockEvents } from '../data/mockEvents';
+import {
+  cities,
+  cityById,
+  defaultCityId,
+  type City,
+} from '../data/cities';
 import { useDrawer, type DrawerState } from '../hooks/useDrawer';
 import { useSheet } from '../hooks/useSheet';
 
@@ -20,6 +25,12 @@ export interface ConfirmConfig {
 }
 
 interface AppContextValue {
+  // City
+  city: City; // active city (center/zoom/bbox/services/consular)
+  cities: City[];
+  cityId: string;
+  setCity: (id: string) => void;
+
   // Data
   events: Event[]; // ordered for the drawer (bumped event first)
   topEventId: string | null; // event bumped to the top of the list
@@ -60,7 +71,10 @@ interface AppContextValue {
 const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [events, setEvents] = useState<Event[]>(mockEvents);
+  const [cityId, setCityId] = useState<string>(defaultCityId);
+  const [events, setEvents] = useState<Event[]>(
+    () => cityById(defaultCityId).events,
+  );
   const [topEventId, setTopEventId] = useState<string | null>(null);
   const [highlightedEventId, setHighlightedEventId] = useState<string | null>(
     null,
@@ -74,6 +88,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const drawer = useDrawer('peek');
   const sos = useSheet(false);
   const settings = useSheet(false);
+
+  const city = cityById(cityId);
+
+  // Switch city: load its events and clear any in-flight selection / open thread.
+  const setCity = useCallback((id: string) => {
+    setCityId(id);
+    setEvents(cityById(id).events);
+    setTopEventId(null);
+    setHighlightedEventId(null);
+    setOpenThreadEventId(null);
+  }, []);
 
   // Order: the bumped event first, everything else in default order.
   const orderedEvents = useMemo(() => {
@@ -127,6 +152,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value: AppContextValue = {
+    city,
+    cities,
+    cityId,
+    setCity,
     events: orderedEvents,
     topEventId,
     highlightedEventId,

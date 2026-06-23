@@ -3,24 +3,16 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useApp } from '../context/AppContext';
 import { eventIcon } from '../utils/eventVisuals';
-import {
-  severityTokens,
-  MAP_CENTER,
-  MAP_ZOOM,
-  MAP_STYLE,
-  FRAME_W,
-  FRAME_H,
-} from '../styles/tokens';
+import { severityTokens, MAP_STYLE, FRAME_W, FRAME_H } from '../styles/tokens';
 import type { Event } from '../types/Event';
+import type { City } from '../data/cities';
 import { StatusPill } from './StatusPill';
 import { ProfileButton } from './ProfileButton';
 import { HelpButton } from './HelpButton';
+import { CitySwitcher } from './CitySwitcher';
 
 const TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
 const hasToken = !!TOKEN && TOKEN.startsWith('pk.');
-
-// Bounding box for the no-token fallback projection (roughly central London).
-const BBOX = { lngMin: -0.16, lngMax: -0.1, latMin: 51.49, latMax: 51.535 };
 
 interface ScreenPin {
   event: Event;
@@ -28,17 +20,32 @@ interface ScreenPin {
   y: number;
 }
 
-function fallbackProject(e: Event, w: number, h: number): { x: number; y: number } {
-  const x = ((e.lng - BBOX.lngMin) / (BBOX.lngMax - BBOX.lngMin)) * w;
-  const y = ((BBOX.latMax - e.lat) / (BBOX.latMax - BBOX.latMin)) * h;
+// No-token fallback: linearly project lng/lat into the frame using the city's bbox.
+function fallbackProject(
+  e: Event,
+  w: number,
+  h: number,
+  bbox: City['bbox'],
+): { x: number; y: number } {
+  const x = ((e.lng - bbox.lngMin) / (bbox.lngMax - bbox.lngMin)) * w;
+  const y = ((bbox.latMax - e.lat) / (bbox.latMax - bbox.latMin)) * h;
   return { x, y };
 }
 
 export function MapView() {
-  const { events, selectPin, highlightedEventId, topEventId, drawerState } =
-    useApp();
+  const {
+    city,
+    cityId,
+    events,
+    selectPin,
+    highlightedEventId,
+    topEventId,
+    drawerState,
+  } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  // Captured once so the init effect can stay run-once.
+  const initialView = useRef({ center: city.center, zoom: city.zoom });
   const [ready, setReady] = useState(!hasToken);
   // Bumped on every map move so we recompute projected pin positions.
   const [tick, setTick] = useState(0);
@@ -52,8 +59,8 @@ export function MapView() {
     const map = new mapboxgl.Map({
       container: containerRef.current,
       style: MAP_STYLE,
-      center: MAP_CENTER,
-      zoom: MAP_ZOOM,
+      center: initialView.current.center,
+      zoom: initialView.current.zoom,
       attributionControl: false,
       // Keep the demo map calm — no rotation / pitch.
       pitchWithRotate: false,
@@ -75,6 +82,15 @@ export function MapView() {
     };
   }, []);
 
+  // Fly to the active city when it changes (real map only).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (hasToken && map) {
+      map.flyTo({ center: city.center, zoom: city.zoom, duration: 1100 });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cityId]);
+
   // Project event coords → screen positions. Reads the map/container refs, so it
   // lives in an effect (re-runs on map move via `tick`, on reorder via `events`,
   // and once the map is `ready`). Cheap for 5 pins.
@@ -89,11 +105,11 @@ export function MapView() {
           const p = map.project([event.lng, event.lat]);
           return { event, x: p.x, y: p.y };
         }
-        const { x, y } = fallbackProject(event, w, h);
+        const { x, y } = fallbackProject(event, w, h, city.bbox);
         return { event, x, y };
       }),
     );
-  }, [events, ready, tick]);
+  }, [events, ready, tick, city]);
 
   const showTopControls = drawerState !== 'fullscreen';
   const showHelp = drawerState === 'peek';
@@ -166,6 +182,9 @@ export function MapView() {
             </div>
             <div className="absolute right-4 top-3">
               <ProfileButton />
+            </div>
+            <div className="absolute left-3 top-[54px]">
+              <CitySwitcher />
             </div>
           </>
         )}

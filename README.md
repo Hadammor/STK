@@ -48,7 +48,9 @@ export const MAP_STYLE = 'mapbox://styles/mapbox/light-v11';
 
 ## What works (acceptance criteria)
 
-1. Loads to a London map with 5 pastel, event-typed pins.
+1. Loads to a London map with 5 pastel, event-typed pins. (Use the **city switcher**
+   top-left to flip between London / Tel Aviv / Bangkok — map, events, and emergency
+   info all change.)
 2. "Active · You'll be notified" status pill, top center.
 3. Drawer peeks with 2 rows + a third peeking.
 4. Drawer snaps between **peek / expanded / fullscreen** — drag the handle, or tap it

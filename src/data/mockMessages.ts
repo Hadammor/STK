@@ -1,6 +1,5 @@
 import type { Event } from '../types/Event';
 import type { Message } from '../types/Message';
-import { featuredEvent } from './mockEvents';
 
 // Build a conversation thread for any event:
 //   1. a rich "event-card" first message
@@ -38,9 +37,6 @@ export function buildThread(event: Event): Message[] {
 
   return messages;
 }
-
-// The featured thread — the demo's showcase conversation.
-export const featuredThread: Message[] = buildThread(featuredEvent);
 
 // Canned quick replies shown at the bottom of every thread.
 export const quickReplies = ['I’m safe', 'I need help', 'Share live location'] as const;

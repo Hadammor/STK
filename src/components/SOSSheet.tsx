@@ -1,21 +1,25 @@
 import { useState } from 'react';
-import { Shield, Ambulance, Flame, MapPin, Phone, Clock, Check } from 'lucide-react';
+import {
+  Shield,
+  Ambulance,
+  Flame,
+  MapPin,
+  Phone,
+  Clock,
+  Check,
+  type LucideIcon,
+} from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { BottomSheet } from './BottomSheet';
 import { colors } from '../styles/tokens';
+import type { EmergencyService } from '../data/cities';
 
-interface CallService {
-  label: string;
-  number: string;
-  Icon: typeof Shield;
-}
-
-// UK: dial 999 (or 112) for any emergency service.
-const services: CallService[] = [
-  { label: 'Police', number: '999', Icon: Shield },
-  { label: 'Ambulance', number: '999', Icon: Ambulance },
-  { label: 'Fire', number: '999', Icon: Flame },
-];
+// Icon per service label — the numbers themselves come from the active city.
+const serviceIcon: Record<string, LucideIcon> = {
+  Police: Shield,
+  Ambulance: Ambulance,
+  Fire: Flame,
+};
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -26,7 +30,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export function SOSSheet() {
-  const { sosOpen, closeSOS, requestConfirm } = useApp();
+  const { sosOpen, closeSOS, requestConfirm, city } = useApp();
   const [helpRequested, setHelpRequested] = useState(false);
 
   // Reset the hero state on every close path (X, backdrop, drag-down).
@@ -44,7 +48,7 @@ export function SOSSheet() {
     });
   }
 
-  function handleCall(service: CallService) {
+  function handleCall(service: EmergencyService) {
     requestConfirm({
       title: `Call ${service.number} (${service.label})?`,
       body: 'This is a demo — no call will be placed.',
@@ -88,45 +92,48 @@ export function SOSSheet() {
       {/* Call now */}
       <SectionLabel>Call now</SectionLabel>
       <div className="grid grid-cols-3 gap-2">
-        {services.map((s) => (
-          <button
-            key={s.label}
-            type="button"
-            aria-label={`Call ${s.label}`}
-            onClick={() => handleCall(s)}
-            className="flex flex-col items-center gap-1.5 rounded-lg border border-hair bg-white py-3 active:bg-surface"
-          >
-            <span className="relative">
-              <s.Icon size={22} strokeWidth={2} color="#000" />
-              <span
-                className="absolute -right-1.5 -top-0.5 h-2 w-2 rounded-full"
-                style={{ backgroundColor: colors.pillHigh.pin }}
-              />
-            </span>
-            <span className="text-caption font-medium text-ink">{s.label}</span>
-            <span className="font-mono text-[22px] font-semibold leading-none text-ink">
-              {s.number}
-            </span>
-          </button>
-        ))}
+        {city.services.map((s) => {
+          const Icon = serviceIcon[s.label] ?? Shield;
+          return (
+            <button
+              key={s.label}
+              type="button"
+              aria-label={`Call ${s.label}`}
+              onClick={() => handleCall(s)}
+              className="flex flex-col items-center gap-1.5 rounded-lg border border-hair bg-white py-3 active:bg-surface"
+            >
+              <span className="relative">
+                <Icon size={22} strokeWidth={2} color="#000" />
+                <span
+                  className="absolute -right-1.5 -top-0.5 h-2 w-2 rounded-full"
+                  style={{ backgroundColor: colors.pillHigh.pin }}
+                />
+              </span>
+              <span className="text-caption font-medium text-ink">
+                {s.label}
+              </span>
+              <span className="font-mono text-[22px] font-semibold leading-none text-ink">
+                {s.number}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Israeli embassy */}
-      <SectionLabel>Israeli embassy</SectionLabel>
+      {/* Consular / embassy contact for the active city */}
+      <SectionLabel>{city.consular.label}</SectionLabel>
       <div className="divide-y divide-hair rounded-lg border border-hair bg-white">
         <div className="flex items-center gap-3 px-4 py-3">
           <MapPin size={18} className="shrink-0 text-ink2" />
-          <span className="text-body text-ink">
-            2 Palace Green, Kensington, London W8 4QB
-          </span>
+          <span className="text-body text-ink">{city.consular.address}</span>
         </div>
         <div className="flex items-center gap-3 px-4 py-3">
           <Phone size={18} className="shrink-0 text-ink2" />
-          <span className="text-body text-ink">+44 20 7957 9500</span>
+          <span className="text-body text-ink">{city.consular.phone}</span>
         </div>
         <div className="flex items-center gap-3 px-4 py-3">
           <Clock size={18} className="shrink-0 text-ink2" />
-          <span className="text-body text-ink">Mon–Thu · 09:00–16:00</span>
+          <span className="text-body text-ink">{city.consular.hours}</span>
         </div>
       </div>
     </BottomSheet>
