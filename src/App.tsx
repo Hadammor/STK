@@ -8,6 +8,7 @@ import { SOSSheet } from './components/SOSSheet';
 import { SettingsSheet } from './components/SettingsSheet';
 import { ConfirmModal } from './components/ConfirmModal';
 import { Toast } from './components/Toast';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // The phone frame holds the map as canvas with all overlays on top.
 function Shell() {
@@ -58,8 +59,10 @@ function Shell() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <Shell />
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <Shell />
+      </AppProvider>
+    </ErrorBoundary>
   );
 }

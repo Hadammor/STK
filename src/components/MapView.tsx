@@ -50,22 +50,36 @@ export function MapView() {
   // Bumped on every map move so we recompute projected pin positions.
   const [tick, setTick] = useState(0);
   const [pins, setPins] = useState<ScreenPin[]>([]);
+  // If Mapbox can't initialise (e.g. WebGL unavailable on the device), we fall
+  // back to the styled map instead of letting the whole app crash to a blank screen.
+  const [mapBroke, setMapBroke] = useState(false);
 
   // --- Initialise the real Mapbox map (only when a token is present) ---
   useEffect(() => {
     if (!hasToken || !containerRef.current) return;
-    mapboxgl.accessToken = TOKEN as string;
 
-    const map = new mapboxgl.Map({
-      container: containerRef.current,
-      style: MAP_STYLE,
-      center: initialView.current.center,
-      zoom: initialView.current.zoom,
-      attributionControl: false,
-      // Keep the demo map calm — no rotation / pitch.
-      pitchWithRotate: false,
-      dragRotate: false,
-    });
+    let map: mapboxgl.Map;
+    try {
+      mapboxgl.accessToken = TOKEN as string;
+      map = new mapboxgl.Map({
+        container: containerRef.current,
+        style: MAP_STYLE,
+        center: initialView.current.center,
+        zoom: initialView.current.zoom,
+        attributionControl: false,
+        // Keep the demo map calm — no rotation / pitch.
+        pitchWithRotate: false,
+        dragRotate: false,
+      });
+    } catch (err) {
+      // WebGL unsupported / context creation failed — degrade gracefully.
+      console.error('Mapbox failed to initialise; using fallback map.', err);
+      /* eslint-disable react-hooks/set-state-in-effect */
+      setMapBroke(true);
+      setReady(true);
+      /* eslint-enable react-hooks/set-state-in-effect */
+      return;
+    }
     mapRef.current = map;
 
     const bump = () => setTick((t) => t + 1);
@@ -75,6 +89,15 @@ export function MapView() {
     });
     map.on('move', bump);
     map.on('resize', bump);
+    // A fatal map error (e.g. WebGL context lost) also falls back.
+    map.on('error', (e) => {
+      const msg = String(e?.error?.message ?? '');
+      if (/webgl|context/i.test(msg)) {
+        console.error('Mapbox runtime error; using fallback map.', e.error);
+        setMapBroke(true);
+        setReady(true);
+      }
+    });
 
     return () => {
       map.remove();
@@ -85,7 +108,7 @@ export function MapView() {
   // Fly to the active city when it changes (real map only).
   useEffect(() => {
     const map = mapRef.current;
-    if (hasToken && map) {
+    if (hasToken && !mapBroke && map) {
       map.flyTo({ center: city.center, zoom: city.zoom, duration: 1100 });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -101,7 +124,7 @@ export function MapView() {
     const map = mapRef.current;
     setPins(
       events.map((event) => {
-        if (hasToken && map && ready) {
+        if (hasToken && !mapBroke && map && ready) {
           const p = map.project([event.lng, event.lat]);
           return { event, x: p.x, y: p.y };
         }
@@ -109,7 +132,7 @@ export function MapView() {
         return { event, x, y };
       }),
     );
-  }, [events, ready, tick, city]);
+  }, [events, ready, tick, city, mapBroke]);
 
   const showTopControls = drawerState !== 'fullscreen';
   const showHelp = drawerState === 'peek';
@@ -117,7 +140,7 @@ export function MapView() {
   return (
     <div className="absolute inset-0 overflow-hidden">
       {/* Map background — real Mapbox or styled fallback */}
-      {hasToken ? (
+      {hasToken && !mapBroke ? (
         <div ref={containerRef} className="absolute inset-0" />
       ) : (
         <div
@@ -135,7 +158,7 @@ export function MapView() {
           <div className="absolute bottom-1/4 left-0 right-0 h-2 rotate-2 bg-white/60" />
           <div className="absolute inset-y-0 left-1/2 w-3 rotate-2 bg-white/60" />
           <div className="absolute left-3 bottom-[262px] rounded-md border border-hair bg-white/80 px-2 py-1 text-micro font-semibold uppercase text-ink2">
-            Map preview · add Mapbox token
+            {mapBroke ? 'Map unavailable on this device' : 'Map preview · add Mapbox token'}
           </div>
         </div>
       )}
