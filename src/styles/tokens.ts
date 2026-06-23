@@ -71,8 +71,8 @@ export const STATIC_MAP_STYLE = 'light-v11';
 export const FRAME_W = 393;
 export const FRAME_H = 852;
 
-// Collapsed (peek) drawer height in px — shows the header + ~1.5 rows.
-export const DRAWER_PEEK_PX = 200;
+// Collapsed (peek) drawer height in px — shows the header + 1 full row + ~half.
+export const DRAWER_PEEK_PX = 168;
 
 // Drawer snap points as a fraction of frame height (visible portion of the drawer).
 export const DRAWER_SNAP = {

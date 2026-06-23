@@ -6,7 +6,7 @@ import {
   useMotionValue,
   type PanInfo,
 } from 'framer-motion';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { useApp, SORT_LABELS, type SortMode } from '../context/AppContext';
 import { EventThreadRow } from './EventThreadRow';
 import { DRAWER_PEEK_PX as PEEK_PX } from '../styles/tokens';
@@ -83,7 +83,7 @@ export function Drawer() {
 
   return (
     <motion.div
-      className="absolute inset-x-0 bottom-0 z-30 flex touch-none flex-col rounded-t-2xl bg-white"
+      className="absolute inset-x-0 bottom-0 z-30 flex flex-col rounded-t-2xl bg-white"
       style={{
         y,
         height: FULL_PX,
@@ -103,7 +103,7 @@ export function Drawer() {
       {/* Drag region: grabber + sort row. Drag/tap here to expand; the sort
           control stops propagation so it doesn't trigger a drag/expand. */}
       <div
-        className="shrink-0 cursor-grab px-5 pt-2.5 active:cursor-grabbing"
+        className="shrink-0 cursor-grab touch-none px-5 pt-2.5 active:cursor-grabbing"
         onPointerDown={(e) => {
           movedRef.current = false;
           controls.start(e);
@@ -118,7 +118,7 @@ export function Drawer() {
       >
         <div className="mx-auto h-1 w-10 rounded-pill bg-hair" />
 
-        <div className="relative mt-2.5 flex items-center">
+        <div className="relative mt-2.5 flex items-center justify-between">
           <button
             type="button"
             aria-label="Sort events"
@@ -133,6 +133,24 @@ export function Drawer() {
             <ChevronDown size={18} className="text-ink3" />
           </button>
 
+          {/* expand / collapse the drawer */}
+          <button
+            type="button"
+            aria-label="Expand drawer"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              cycle();
+            }}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-surface text-ink2 transition-transform active:scale-90"
+          >
+            {drawerState === 'fullscreen' ? (
+              <ChevronDown size={18} />
+            ) : (
+              <ChevronUp size={18} />
+            )}
+          </button>
+
           {sortOpen && (
             <>
               <button
@@ -145,7 +163,7 @@ export function Drawer() {
                 }}
                 className="fixed inset-0 z-0 cursor-default"
               />
-              <div className="absolute left-0 top-8 z-10 w-52 overflow-hidden rounded-xl border border-hair bg-white">
+              <div className="absolute bottom-full left-0 z-10 mb-2 w-52 overflow-hidden rounded-xl border border-hair bg-white shadow-lg">
                 {(Object.keys(SORT_LABELS) as SortMode[]).map((m) => (
                   <button
                     key={m}
@@ -172,7 +190,7 @@ export function Drawer() {
       {/* Scrollable list */}
       <div
         ref={scrollRef}
-        className="no-scrollbar mt-1 flex-1 overflow-y-auto overscroll-contain px-5 pb-6"
+        className="no-scrollbar mt-1 flex-1 touch-pan-y overflow-y-auto overscroll-contain px-5 pb-6"
       >
         <div className="flex flex-col divide-y divide-hair">
           {events.map((event) => (

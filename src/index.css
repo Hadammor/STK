@@ -15,6 +15,12 @@ body,
   height: 100%;
 }
 
+html,
+body {
+  /* White so the safe-area strips (notch / home indicator) read as part of the app. */
+  background: #ffffff;
+}
+
 body {
   margin: 0;
   /* Lead with the real Apple system font (SF Pro) so it looks native on iOS/macOS,
@@ -24,8 +30,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* Neutral page backdrop behind the phone frame */
-  background: #e7e7ea;
   color: #000000;
 }
 
