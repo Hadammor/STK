@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { BottomSheet } from './BottomSheet';
-import { colors } from '../styles/tokens';
+import { SlideToConfirm } from './SlideToConfirm';
+import { colors, accent } from '../styles/tokens';
 import type { EmergencyService } from '../data/cities';
 
 // Icon per service label — the numbers themselves come from the active city.
@@ -39,15 +40,6 @@ export function SOSSheet() {
     closeSOS();
   }
 
-  function handleNeedHelp() {
-    requestConfirm({
-      title: 'Send your location?',
-      body: 'This will share your location with GardaWorld Security.',
-      confirmLabel: 'Send',
-      onConfirm: () => setHelpRequested(true),
-    });
-  }
-
   function handleCall(service: EmergencyService) {
     requestConfirm({
       title: `Call ${service.number} (${service.label})?`,
@@ -60,31 +52,24 @@ export function SOSSheet() {
   }
 
   return (
-    <BottomSheet open={sosOpen} onClose={handleClose} heightPct={0.85} title="Emergency">
-      {/* Hero — the only red in the app */}
+    <BottomSheet open={sosOpen} onClose={handleClose} heightPct={0.72} title="Emergency">
+      {/* Hero — slide to call (deliberate; avoids accidental taps) */}
       {helpRequested ? (
-        <div
-          className="flex h-[72px] w-full items-center justify-center gap-2 rounded-xl px-4 text-center"
-          style={{ backgroundColor: colors.pillAllClear.bg, color: colors.pillAllClear.text }}
-        >
-          <Check size={20} />
-          <span className="text-body font-semibold">
-            Help is aware. Stay where you are if safe.
+        <div className="flex h-[60px] w-full items-center justify-center gap-2 rounded-2xl border border-hair bg-surface px-4 text-center">
+          <Check size={20} className="text-ink" />
+          <span className="text-body font-semibold text-ink">
+            Calling… help is aware. Stay where you are if safe.
           </span>
         </div>
       ) : (
         <>
-          <button
-            type="button"
-            aria-label="I need help"
-            onClick={handleNeedHelp}
-            className="h-[72px] w-full rounded-xl text-[18px] font-semibold text-white transition-transform active:scale-[0.98] active:opacity-90"
-            style={{ backgroundColor: colors.emergency }}
-          >
-            I need help
-          </button>
+          <SlideToConfirm
+            label="Call for help"
+            color={accent.sos}
+            onConfirm={() => setHelpRequested(true)}
+          />
           <p className="mt-2 text-caption text-ink2">
-            Sends your location to GardaWorld Security.
+            Slide to call. Shares your location with GardaWorld Security.
           </p>
         </>
       )}

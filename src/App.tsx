@@ -1,6 +1,5 @@
 import { AnimatePresence } from 'framer-motion';
 import { AppProvider, useApp } from './context/AppContext';
-import { FRAME_W, FRAME_H } from './styles/tokens';
 import { MapView } from './components/MapView';
 import { Drawer } from './components/Drawer';
 import { EventThreadView } from './components/EventThreadView';
@@ -10,17 +9,15 @@ import { ConfirmModal } from './components/ConfirmModal';
 import { Toast } from './components/Toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
-// The phone frame holds the map as canvas with all overlays on top.
+// Full-screen app frame: fills the browser viewport height (so nothing gets
+// cut off), mobile-capped width, centered.
 function Shell() {
   const { openThreadEventId, getEvent, closeThread, confirm, closeConfirm } =
     useApp();
   const threadEvent = openThreadEventId ? getEvent(openThreadEventId) : undefined;
 
   return (
-    <div
-      className="relative select-none overflow-hidden rounded-[28px] border border-hair bg-bg"
-      style={{ width: FRAME_W, height: FRAME_H }}
-    >
+    <div className="relative mx-auto h-[100dvh] w-full max-w-[440px] select-none overflow-hidden bg-bg">
       <MapView />
       <Drawer />
 

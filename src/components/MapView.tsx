@@ -9,6 +9,7 @@ import {
   MAP_STYLE,
   FRAME_W,
   FRAME_H,
+  DRAWER_PEEK_PX,
 } from '../styles/tokens';
 import type { Event } from '../types/Event';
 import type { City } from '../data/cities';
@@ -50,6 +51,7 @@ export function MapView() {
     highlightedEventId,
     topEventId,
     drawerState,
+    setDrawerState,
     showToast,
   } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -100,6 +102,8 @@ export function MapView() {
     });
     map.on('move', bump);
     map.on('resize', bump);
+    // Tapping the map (not a pin/control) collapses the drawer to its peek state.
+    map.on('click', () => setDrawerState('peek'));
     // A fatal map error (e.g. WebGL context lost) also falls back.
     map.on('error', (e) => {
       const msg = String(e?.error?.message ?? '');
@@ -114,7 +118,19 @@ export function MapView() {
       map.remove();
       mapRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Tapping a pin re-centers the map on that event.
+  useEffect(() => {
+    if (!highlightedEventId) return;
+    const map = mapRef.current;
+    const ev = events.find((e) => e.id === highlightedEventId);
+    if (ev && hasToken && !mapBroke && map) {
+      map.flyTo({ center: [ev.lng, ev.lat], duration: 700 });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightedEventId]);
 
   // Fly to the active city when it changes (real map only).
   useEffect(() => {
@@ -171,6 +187,7 @@ export function MapView() {
       ) : (
         <div
           ref={containerRef}
+          onClick={() => setDrawerState('peek')}
           className="absolute inset-0"
           style={{
             background:
@@ -200,11 +217,11 @@ export function MapView() {
             >
               <span
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                style={{ width: 42, height: 42, backgroundColor: accent.blue, opacity: 0.16 }}
+                style={{ width: 42, height: 42, backgroundColor: accent.location, opacity: 0.16 }}
               />
               <span
                 className="relative block h-4 w-4 rounded-full border-2 border-white"
-                style={{ backgroundColor: accent.blue }}
+                style={{ backgroundColor: accent.location }}
               />
             </div>
           )}
@@ -271,8 +288,8 @@ export function MapView() {
         )}
         {showBottomControls && (
           <>
-            <RecenterButton onClick={recenter} />
-            <SOSButton />
+            <RecenterButton onClick={recenter} bottomOffset={DRAWER_PEEK_PX + 16} />
+            <SOSButton bottomOffset={DRAWER_PEEK_PX + 16} />
           </>
         )}
       </div>

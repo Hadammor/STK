@@ -11,7 +11,7 @@ export function StatusPill() {
       type="button"
       onClick={() => showToast('Status: Active — demo')}
       className="pointer-events-auto flex items-center gap-2 rounded-pill px-3.5 py-2 text-caption font-semibold text-white transition-transform active:scale-95"
-      style={{ backgroundColor: accent.green }}
+      style={{ backgroundColor: accent.active }}
     >
       <Navigation size={14} fill="currentColor" strokeWidth={0} />
       Active

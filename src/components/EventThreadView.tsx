@@ -7,7 +7,7 @@ import { buildThread, quickReplies } from '../data/mockMessages';
 import { eventIcon, eventTypeLabel } from '../utils/eventVisuals';
 import { severityTokens, STATIC_MAP_STYLE } from '../styles/tokens';
 import { formatClock, formatWhen } from '../utils/time';
-import { SeverityPill } from './SeverityPill';
+import { useApp } from '../context/AppContext';
 
 const TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
 const hasToken = !!TOKEN && TOKEN.startsWith('pk.');
@@ -40,24 +40,25 @@ function MiniMap({ event }: { event: Event }) {
   );
 }
 
-function RichCard({ event }: { event: Event }) {
+function RichCard({
+  event,
+  onShowOnMap,
+}: {
+  event: Event;
+  onShowOnMap: () => void;
+}) {
   const t = severityTokens[event.severity];
   const Icon = eventIcon[event.type];
   return (
-    <div className="shrink-0 overflow-hidden rounded-lg border border-hair bg-white">
-      {/* severity top stripe */}
-      <div className="h-[3px] w-full" style={{ backgroundColor: t.pin }} />
+    <div className="shrink-0 overflow-hidden rounded-xl border border-hair bg-white">
       <div className="p-4">
-        {/* type + severity */}
-        <div className="flex items-center justify-between">
-          <span className="flex items-center gap-1.5 text-micro font-semibold uppercase text-ink2">
-            <Icon size={14} strokeWidth={2} color="#000" />
-            {eventTypeLabel[event.type]}
-          </span>
-          <SeverityPill severity={event.severity} />
-        </div>
+        {/* event type */}
+        <span className="flex items-center gap-1.5 text-micro font-semibold uppercase text-ink2">
+          <Icon size={14} strokeWidth={2} color="#000" />
+          {eventTypeLabel[event.type]}
+        </span>
 
-        <h3 className="mt-2.5 text-bodylg font-semibold tracking-title text-ink">
+        <h3 className="mt-1.5 text-title font-bold tracking-title text-ink">
           {event.title}
         </h3>
         <p className="mt-1 text-caption text-ink2">
@@ -67,6 +68,14 @@ function RichCard({ event }: { event: Event }) {
         <div className="mt-3">
           <MiniMap event={event} />
         </div>
+
+        <button
+          type="button"
+          onClick={onShowOnMap}
+          className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-md border border-hair bg-white py-2.5 text-body font-semibold text-ink transition-transform active:scale-[0.99] active:bg-surface"
+        >
+          <MapPin size={16} /> Show on map
+        </button>
 
         <p className="mt-3 text-body text-ink">{event.description}</p>
 
@@ -95,7 +104,7 @@ function RichCard({ event }: { event: Event }) {
 
 function UpdateBubble({ message }: { message: Message }) {
   return (
-    <div className="max-w-[85%] shrink-0 self-start rounded-lg rounded-tl-sm border border-hair bg-surface px-3.5 py-2.5">
+    <div className="max-w-[85%] shrink-0 self-start rounded-lg rounded-tl-sm border border-hair bg-white px-3.5 py-2.5">
       <p className="text-body text-ink">{message.text}</p>
       <p className="mt-1 text-micro font-medium text-ink3">
         {formatClock(message.timestamp)}
@@ -139,10 +148,17 @@ export function EventThreadView({
   event: Event;
   onClose: () => void;
 }) {
+  const { selectPin } = useApp();
   const initial = useMemo(() => buildThread(event), [event]);
   const [messages, setMessages] = useState<Message[]>(initial);
   const [draft, setDraft] = useState('');
   const controls = useDragControls();
+
+  // Close the thread and surface this event on the map (centers + bumps to top).
+  function showOnMap() {
+    onClose();
+    selectPin(event.id);
+  }
   const scrollRef = useRef<HTMLDivElement>(null);
   const seq = useRef(0);
   const initialLen = useRef(initial.length);
@@ -209,22 +225,19 @@ export function EventThreadView({
       dragElastic={{ top: 0, bottom: 0.5 }}
       onDragEnd={handleDragEnd}
     >
-      {/* Header (drag region) */}
+      {/* Header (drag region) — pushed down from the very top */}
       <div
-        className="shrink-0 cursor-grab border-b border-hair active:cursor-grabbing"
+        className="shrink-0 cursor-grab border-b border-hair pt-3 active:cursor-grabbing"
         onPointerDown={(e) => controls.start(e)}
       >
-        <div className="mx-auto mt-2 h-1 w-10 rounded-pill bg-hair" />
+        <div className="mx-auto mt-1 h-1 w-10 rounded-pill bg-hair" />
         <div className="flex items-center gap-3 px-4 py-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-ink text-bodylg font-semibold text-white">
-            G
-          </span>
           <div className="min-w-0 flex-1">
-            <p className="text-body font-semibold tracking-title text-ink">
+            <p className="text-bodylg font-semibold tracking-title text-ink">
               Guy
             </p>
             <p className="flex items-center gap-1.5 text-micro font-medium text-ink2">
-              <span className="h-1.5 w-1.5 rounded-full bg-clear-pin" />
+              <span className="h-1.5 w-1.5 rounded-full bg-ink3" />
               Monitoring · replies in ~2 min
             </p>
           </div>
@@ -243,9 +256,11 @@ export function EventThreadView({
       <div
         ref={scrollRef}
         className="no-scrollbar flex flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-4 py-4"
+        style={{ backgroundColor: '#FBFBFC' }}
       >
         {messages.map((m) => {
-          if (m.kind === 'event-card') return <RichCard key={m.id} event={event} />;
+          if (m.kind === 'event-card')
+            return <RichCard key={m.id} event={event} onShowOnMap={showOnMap} />;
           if (m.kind === 'system') return <SystemNotice key={m.id} message={m} />;
           if (m.kind === 'user') return <UserBubble key={m.id} message={m} />;
           return <UpdateBubble key={m.id} message={m} />;

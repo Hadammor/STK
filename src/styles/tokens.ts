@@ -36,21 +36,21 @@ export const severityTokens: Record<
   critical: { ...colors.pillCritical, label: 'Critical' },
 };
 
-// Vivid (saturated) fills for the iOS-style map markers + drawer row icons
-// (solid circle + white glyph). Keyed by severity.
+// Toned-down warm fills (yellow → orange → red, no blue/green) for the map
+// markers + drawer row icons (solid circle + white glyph). Keyed by severity.
 export const severityVivid: Record<Severity, string> = {
-  allClear: '#34C759',
-  low: '#3B82F6',
-  moderate: '#F59E0B',
-  high: '#F97316',
-  critical: '#EF4444',
+  allClear: '#A8A39A', // resolved — calm warm grey
+  low: '#E0B84C', // yellow
+  moderate: '#E0883C', // orange
+  high: '#D45F38', // burnt orange
+  critical: '#C0443A', // red
 };
 
-// iOS accent colors used by the redesigned chrome.
+// Accent colors used by the redesigned chrome (warm/neutral — no blue/green).
 export const accent = {
-  blue: '#0A84FF', // user-location dot
-  green: '#2FBF71', // "Active" status pill
-  red: '#E5484D', // SOS button
+  location: '#3A3A3C', // user-location dot (neutral)
+  active: '#222226', // "Active" status pill (dark)
+  sos: '#D14B43', // SOS (toned red)
 } as const;
 
 // London — demo map center + default zoom.
@@ -67,8 +67,12 @@ export const MAP_STYLE = 'mapbox://styles/mapbox/light-v11';
 export const STATIC_MAP_STYLE = 'light-v11';
 
 // Phone frame — mobile-sized in a desktop browser (iPhone 14 Pro: 393×852).
+// FRAME_H is now only a fallback; the live viewport height drives layout.
 export const FRAME_W = 393;
 export const FRAME_H = 852;
+
+// Collapsed (peek) drawer height in px — shows the header + ~1.5 rows.
+export const DRAWER_PEEK_PX = 200;
 
 // Drawer snap points as a fraction of frame height (visible portion of the drawer).
 export const DRAWER_SNAP = {

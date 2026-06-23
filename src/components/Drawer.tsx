@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   animate,
   motion,
@@ -6,21 +6,12 @@ import {
   useMotionValue,
   type PanInfo,
 } from 'framer-motion';
-import { ChevronUp, ChevronDown } from 'lucide-react';
-import { useApp } from '../context/AppContext';
-import { FRAME_H, DRAWER_SNAP } from '../styles/tokens';
+import { ChevronDown, Check } from 'lucide-react';
+import { useApp, SORT_LABELS, type SortMode } from '../context/AppContext';
 import { EventThreadRow } from './EventThreadRow';
+import { DRAWER_PEEK_PX as PEEK_PX } from '../styles/tokens';
 import type { DrawerState } from '../hooks/useDrawer';
 
-// Visible drawer height (px) for each snap state.
-const FULL_PX = FRAME_H * DRAWER_SNAP.fullscreen; // total panel height
-const snapY: Record<DrawerState, number> = {
-  fullscreen: 0, // panel top at 5% from the top of the frame
-  expanded: FRAME_H * (DRAWER_SNAP.fullscreen - DRAWER_SNAP.expanded),
-  peek: FRAME_H * (DRAWER_SNAP.fullscreen - DRAWER_SNAP.peek),
-};
-
-// iOS-like sheet spring: snappy, settles cleanly without bounce.
 const SPRING = { type: 'spring' as const, stiffness: 400, damping: 38 };
 
 export function Drawer() {
@@ -31,15 +22,26 @@ export function Drawer() {
     openThread,
     highlightedEventId,
     clearHighlight,
+    frameH,
+    sortMode,
+    setSortMode,
   } = useApp();
+
+  // Snap geometry derived from the live viewport height.
+  const FULL_PX = frameH * 0.95;
+  const snapY: Record<DrawerState, number> = {
+    fullscreen: 0,
+    expanded: FULL_PX - frameH * 0.62,
+    peek: FULL_PX - PEEK_PX,
+  };
 
   const y = useMotionValue(snapY.peek);
   const controls = useDragControls();
   const draggingRef = useRef(false);
-  const movedRef = useRef(false); // did the current gesture become a drag?
+  const movedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [sortOpen, setSortOpen] = useState(false);
 
-  // Tapping the handle advances the snap state (complements dragging).
   const cycle = () => {
     setDrawerState(
       drawerState === 'peek'
@@ -50,15 +52,15 @@ export function Drawer() {
     );
   };
 
-  // Animate to the active snap whenever drawerState changes externally
-  // (e.g. a pin tap expands the drawer). Skipped while the user is dragging.
+  // Animate to the active snap when the state (or viewport height) changes.
   useEffect(() => {
     if (draggingRef.current) return;
     const anim = animate(y, snapY[drawerState], SPRING);
     return () => anim.stop();
-  }, [drawerState, y]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drawerState, frameH]);
 
-  // When a pin highlights a row, the row is bumped to the top — scroll there.
+  // When a pin bumps a row to the top, scroll the list up to reveal it.
   useEffect(() => {
     if (highlightedEventId && scrollRef.current) {
       scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
@@ -81,8 +83,12 @@ export function Drawer() {
 
   return (
     <motion.div
-      className="absolute inset-x-0 bottom-0 z-30 flex touch-none flex-col rounded-t-2xl border-t border-hair bg-white"
-      style={{ y, height: FULL_PX }}
+      className="absolute inset-x-0 bottom-0 z-30 flex touch-none flex-col rounded-t-2xl bg-white"
+      style={{
+        y,
+        height: FULL_PX,
+        boxShadow: '0 -10px 30px rgba(0,0,0,0.16)',
+      }}
       drag="y"
       dragListener={false}
       dragControls={controls}
@@ -94,7 +100,8 @@ export function Drawer() {
       }}
       onDragEnd={handleDragEnd}
     >
-      {/* Drag region: handle + header (pointer-down starts the drag) */}
+      {/* Drag region: grabber + sort row. Drag/tap here to expand; the sort
+          control stops propagation so it doesn't trigger a drag/expand. */}
       <div
         className="shrink-0 cursor-grab px-5 pt-2.5 active:cursor-grabbing"
         onPointerDown={(e) => {
@@ -102,7 +109,6 @@ export function Drawer() {
           controls.start(e);
         }}
         onClick={() => {
-          // A click that wasn't part of a drag is a tap → advance the snap state.
           if (movedRef.current) {
             movedRef.current = false;
             return;
@@ -111,33 +117,62 @@ export function Drawer() {
         }}
       >
         <div className="mx-auto h-1 w-10 rounded-pill bg-hair" />
-        <div className="mt-3 flex items-center justify-between">
-          <h2 className="text-title font-bold tracking-title text-ink">
-            Around your location
-          </h2>
+
+        <div className="relative mt-2.5 flex items-center">
           <button
             type="button"
-            aria-label="Toggle drawer"
+            aria-label="Sort events"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
-              cycle();
+              setSortOpen((o) => !o);
             }}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-surface text-ink2 transition-transform active:scale-90"
+            className="flex items-center gap-1 text-bodylg font-semibold tracking-title text-ink active:opacity-60"
           >
-            {drawerState === 'fullscreen' ? (
-              <ChevronDown size={18} />
-            ) : (
-              <ChevronUp size={18} />
-            )}
+            {SORT_LABELS[sortMode]}
+            <ChevronDown size={18} className="text-ink3" />
           </button>
+
+          {sortOpen && (
+            <>
+              <button
+                type="button"
+                aria-label="Dismiss sort"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSortOpen(false);
+                }}
+                className="fixed inset-0 z-0 cursor-default"
+              />
+              <div className="absolute left-0 top-8 z-10 w-52 overflow-hidden rounded-xl border border-hair bg-white">
+                {(Object.keys(SORT_LABELS) as SortMode[]).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    aria-label={SORT_LABELS[m]}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSortMode(m);
+                      setSortOpen(false);
+                    }}
+                    className="flex w-full items-center justify-between border-b border-hair px-4 py-3 text-left text-body text-ink last:border-b-0 active:bg-surface"
+                  >
+                    {SORT_LABELS[m]}
+                    {m === sortMode && <Check size={16} />}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Scrollable thread list */}
+      {/* Scrollable list */}
       <div
         ref={scrollRef}
-        className="no-scrollbar mt-2 flex-1 overflow-y-auto overscroll-contain px-5 pb-6"
+        className="no-scrollbar mt-1 flex-1 overflow-y-auto overscroll-contain px-5 pb-6"
       >
         <div className="flex flex-col divide-y divide-hair">
           {events.map((event) => (
