@@ -6,10 +6,10 @@ import {
   useMotionValue,
   type PanInfo,
 } from 'framer-motion';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { FRAME_H, DRAWER_SNAP } from '../styles/tokens';
 import { EventThreadRow } from './EventThreadRow';
-import { formatRelative } from '../utils/time';
 import type { DrawerState } from '../hooks/useDrawer';
 
 // Visible drawer height (px) for each snap state.
@@ -79,11 +79,6 @@ export function Drawer() {
     setDrawerState(best);
   }
 
-  const lastUpdated = events.reduce(
-    (acc, e) => (e.latestUpdateTime > acc ? e.latestUpdateTime : acc),
-    events[0].latestUpdateTime,
-  );
-
   return (
     <motion.div
       className="absolute inset-x-0 bottom-0 z-30 flex touch-none flex-col rounded-t-2xl border-t border-hair bg-white"
@@ -116,22 +111,35 @@ export function Drawer() {
         }}
       >
         <div className="mx-auto h-1 w-10 rounded-pill bg-hair" />
-        <div className="mt-3 flex items-baseline justify-between">
+        <div className="mt-3 flex items-center justify-between">
           <h2 className="text-title font-bold tracking-title text-ink">
-            Around you
+            Around your location
           </h2>
+          <button
+            type="button"
+            aria-label="Toggle drawer"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              cycle();
+            }}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-surface text-ink2 transition-transform active:scale-90"
+          >
+            {drawerState === 'fullscreen' ? (
+              <ChevronDown size={18} />
+            ) : (
+              <ChevronUp size={18} />
+            )}
+          </button>
         </div>
-        <p className="mt-0.5 text-caption text-ink2">
-          {events.length} events · updated {formatRelative(lastUpdated)}
-        </p>
       </div>
 
       {/* Scrollable thread list */}
       <div
         ref={scrollRef}
-        className="no-scrollbar mt-2 flex-1 overflow-y-auto overscroll-contain px-3 pb-6"
+        className="no-scrollbar mt-2 flex-1 overflow-y-auto overscroll-contain px-5 pb-6"
       >
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col divide-y divide-hair">
           {events.map((event) => (
             <EventThreadRow
               key={event.id}

@@ -36,6 +36,23 @@ export const severityTokens: Record<
   critical: { ...colors.pillCritical, label: 'Critical' },
 };
 
+// Vivid (saturated) fills for the iOS-style map markers + drawer row icons
+// (solid circle + white glyph). Keyed by severity.
+export const severityVivid: Record<Severity, string> = {
+  allClear: '#34C759',
+  low: '#3B82F6',
+  moderate: '#F59E0B',
+  high: '#F97316',
+  critical: '#EF4444',
+};
+
+// iOS accent colors used by the redesigned chrome.
+export const accent = {
+  blue: '#0A84FF', // user-location dot
+  green: '#2FBF71', // "Active" status pill
+  red: '#E5484D', // SOS button
+} as const;
+
 // London — demo map center + default zoom.
 export const MAP_CENTER: [number, number] = [-0.128, 51.513];
 export const MAP_ZOOM = 12.5;

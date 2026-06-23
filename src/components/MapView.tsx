@@ -3,14 +3,21 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useApp } from '../context/AppContext';
 import { eventIcon } from '../utils/eventVisuals';
-import { severityTokens, MAP_STYLE, FRAME_W, FRAME_H } from '../styles/tokens';
+import {
+  severityVivid,
+  accent,
+  MAP_STYLE,
+  FRAME_W,
+  FRAME_H,
+} from '../styles/tokens';
 import type { Event } from '../types/Event';
 import type { City } from '../data/cities';
+import { StatusBar } from './StatusBar';
+import { SearchBar } from './SearchBar';
 import { StatusPill } from './StatusPill';
 import { ProfileButton } from './ProfileButton';
-import { HelpButton } from './HelpButton';
-import { CitySwitcher } from './CitySwitcher';
-import { StatusBar } from './StatusBar';
+import { RecenterButton } from './RecenterButton';
+import { SOSButton } from './SOSButton';
 
 const TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
 const hasToken = !!TOKEN && TOKEN.startsWith('pk.');
@@ -23,13 +30,14 @@ interface ScreenPin {
 
 // No-token fallback: linearly project lng/lat into the frame using the city's bbox.
 function fallbackProject(
-  e: Event,
+  lng: number,
+  lat: number,
   w: number,
   h: number,
   bbox: City['bbox'],
 ): { x: number; y: number } {
-  const x = ((e.lng - bbox.lngMin) / (bbox.lngMax - bbox.lngMin)) * w;
-  const y = ((bbox.latMax - e.lat) / (bbox.latMax - bbox.latMin)) * h;
+  const x = ((lng - bbox.lngMin) / (bbox.lngMax - bbox.lngMin)) * w;
+  const y = ((bbox.latMax - lat) / (bbox.latMax - bbox.latMin)) * h;
   return { x, y };
 }
 
@@ -42,6 +50,7 @@ export function MapView() {
     highlightedEventId,
     topEventId,
     drawerState,
+    showToast,
   } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -51,6 +60,7 @@ export function MapView() {
   // Bumped on every map move so we recompute projected pin positions.
   const [tick, setTick] = useState(0);
   const [pins, setPins] = useState<ScreenPin[]>([]);
+  const [userPos, setUserPos] = useState<{ x: number; y: number } | null>(null);
   // If Mapbox can't initialise (e.g. WebGL unavailable on the device), we fall
   // back to the styled map instead of letting the whole app crash to a blank screen.
   const [mapBroke, setMapBroke] = useState(false);
@@ -123,20 +133,32 @@ export function MapView() {
     const w = el?.clientWidth ?? FRAME_W;
     const h = el?.clientHeight ?? FRAME_H;
     const map = mapRef.current;
+    const live = hasToken && !mapBroke && map && ready;
+    const project = (lng: number, lat: number) =>
+      live ? map!.project([lng, lat]) : fallbackProject(lng, lat, w, h, city.bbox);
+
     setPins(
       events.map((event) => {
-        if (hasToken && !mapBroke && map && ready) {
-          const p = map.project([event.lng, event.lat]);
-          return { event, x: p.x, y: p.y };
-        }
-        const { x, y } = fallbackProject(event, w, h, city.bbox);
-        return { event, x, y };
+        const p = project(event.lng, event.lat);
+        return { event, x: p.x, y: p.y };
       }),
     );
+    const c = project(city.center[0], city.center[1]);
+    setUserPos({ x: c.x, y: c.y });
   }, [events, ready, tick, city, mapBroke]);
 
+  // Recenter / locate-me → fly back to the city center (or a no-op toast on fallback).
+  function recenter() {
+    const map = mapRef.current;
+    if (hasToken && !mapBroke && map) {
+      map.flyTo({ center: city.center, zoom: city.zoom, duration: 800 });
+    } else {
+      showToast('Recenter — demo');
+    }
+  }
+
   const showTopControls = drawerState !== 'fullscreen';
-  const showHelp = drawerState === 'peek';
+  const showBottomControls = drawerState === 'peek';
 
   return (
     <div className="absolute inset-0 overflow-hidden">
@@ -167,56 +189,92 @@ export function MapView() {
         </div>
       )}
 
-      {/* Pins (React overlay so they keep real icons + a clean selected ring) */}
-      {ready &&
-        pins.map(({ event, x, y }) => {
-          const t = severityTokens[event.severity];
-          const Icon = eventIcon[event.type];
-          const selected =
-            highlightedEventId === event.id || topEventId === event.id;
-          return (
-            <button
-              key={event.id}
-              type="button"
-              onClick={() => selectPin(event.id)}
-              aria-label={event.title}
-              className="absolute z-10 flex items-center justify-center rounded-full transition-transform"
-              style={{
-                left: x,
-                top: y,
-                width: 40,
-                height: 40,
-                marginLeft: -20,
-                marginTop: -20,
-                backgroundColor: t.pin,
-                border: `1px solid rgba(0,0,0,0.18)`,
-                transform: selected ? 'scale(1.15)' : 'scale(1)',
-                outline: selected ? '2px solid #000' : 'none',
-                outlineOffset: 2,
-              }}
+      {/* Map markers (React overlay) */}
+      {ready && (
+        <>
+          {/* user location — iOS blue dot + soft halo */}
+          {userPos && (
+            <div
+              className="pointer-events-none absolute z-[9]"
+              style={{ left: userPos.x, top: userPos.y, width: 16, height: 16, marginLeft: -8, marginTop: -8 }}
             >
-              <Icon size={18} strokeWidth={2} color="#000" />
-            </button>
-          );
-        })}
+              <span
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                style={{ width: 42, height: 42, backgroundColor: accent.blue, opacity: 0.16 }}
+              />
+              <span
+                className="relative block h-4 w-4 rounded-full border-2 border-white"
+                style={{ backgroundColor: accent.blue }}
+              />
+            </div>
+          )}
+
+          {/* event pins — vivid solid circle + white glyph + soft halo */}
+          {pins.map(({ event, x, y }) => {
+            const color = severityVivid[event.severity];
+            const Icon = eventIcon[event.type];
+            const selected =
+              highlightedEventId === event.id || topEventId === event.id;
+            return (
+              <button
+                key={event.id}
+                type="button"
+                onClick={() => selectPin(event.id)}
+                aria-label={event.title}
+                className="absolute z-10 transition-transform"
+                style={{
+                  left: x,
+                  top: y,
+                  width: 40,
+                  height: 40,
+                  marginLeft: -20,
+                  marginTop: -20,
+                  transform: `scale(${selected ? 1.12 : 1})`,
+                }}
+              >
+                <span
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                  style={{ width: 60, height: 60, backgroundColor: color, opacity: selected ? 0.28 : 0.2 }}
+                />
+                <span
+                  className="relative flex h-10 w-10 items-center justify-center rounded-full"
+                  style={{
+                    backgroundColor: color,
+                    border: '2px solid #fff',
+                    outline: selected ? '2px solid #000' : 'none',
+                    outlineOffset: 1,
+                  }}
+                >
+                  <Icon size={20} strokeWidth={2.4} color="#fff" />
+                </span>
+              </button>
+            );
+          })}
+        </>
+      )}
 
       {/* Floating chrome over the map */}
       <div className="pointer-events-none absolute inset-0 z-20">
         <StatusBar />
         {showTopControls && (
           <>
-            <div className="absolute left-0 right-0 top-[42px] flex justify-center">
-              <StatusPill />
-            </div>
-            <div className="absolute right-4 top-[42px]">
+            {/* search bar + profile */}
+            <div className="absolute inset-x-3 top-[48px] flex items-center gap-2.5">
+              <SearchBar />
               <ProfileButton />
             </div>
-            <div className="absolute left-3 top-[88px]">
-              <CitySwitcher />
+            {/* status pill */}
+            <div className="absolute left-0 right-0 top-[104px] flex justify-center">
+              <StatusPill />
             </div>
           </>
         )}
-        {showHelp && <HelpButton />}
+        {showBottomControls && (
+          <>
+            <RecenterButton onClick={recenter} />
+            <SOSButton />
+          </>
+        )}
       </div>
     </div>
   );
