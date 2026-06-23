@@ -275,13 +275,19 @@ export function MapView() {
         <StatusBar />
         {showTopControls && (
           <>
-            {/* search bar + profile */}
-            <div className="absolute inset-x-3 top-[48px] flex items-center gap-2.5">
+            {/* search bar + profile — pushed below the device/browser top chrome */}
+            <div
+              className="absolute inset-x-3 flex items-center gap-2.5"
+              style={{ top: 'calc(env(safe-area-inset-top) + 78px)' }}
+            >
               <SearchBar />
               <ProfileButton />
             </div>
             {/* status pill */}
-            <div className="absolute left-0 right-0 top-[104px] flex justify-center">
+            <div
+              className="absolute left-0 right-0 flex justify-center"
+              style={{ top: 'calc(env(safe-area-inset-top) + 134px)' }}
+            >
               <StatusPill />
             </div>
           </>
