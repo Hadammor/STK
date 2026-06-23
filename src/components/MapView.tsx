@@ -225,7 +225,7 @@ export function MapView() {
           {/* user location — iOS blue dot + soft halo */}
           {userPos && (
             <div
-              className="pointer-events-none absolute z-[9]"
+              className="pointer-events-none absolute z-[12]"
               style={{ left: userPos.x, top: userPos.y, width: 16, height: 16, marginLeft: -8, marginTop: -8 }}
             >
               <span

@@ -225,8 +225,8 @@ const london: City = {
       recommendedAction:
         'Avoid Whitehall and Trafalgar Square. Expect road closures and bus diversions across the centre; allow extra time.',
       source: 'GardaWorld',
-      lat: 51.5138,
-      lng: -0.1288,
+      lat: 51.508,
+      lng: -0.1281,
       area: 'Whitehall → Trafalgar Sq',
       status: 'active',
       firstReportTime: minsAgo(35),
