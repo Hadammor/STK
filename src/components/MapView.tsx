@@ -139,9 +139,12 @@ export function MapView() {
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Map background — real Mapbox or styled fallback */}
+      {/* Map background — real Mapbox or styled fallback.
+          NB: use h-full/w-full (not inset-0). Mapbox's own CSS forces
+          .mapboxgl-map to position:relative, which cancels inset-0 stretching
+          and collapses the container to 0 height → blank map. */}
       {hasToken && !mapBroke ? (
-        <div ref={containerRef} className="absolute inset-0" />
+        <div ref={containerRef} className="h-full w-full" />
       ) : (
         <div
           ref={containerRef}
