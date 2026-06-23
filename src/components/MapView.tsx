@@ -52,6 +52,7 @@ export function MapView() {
     drawerState,
     setDrawerState,
     showToast,
+    frameH,
   } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -173,7 +174,12 @@ export function MapView() {
   }
 
   const showTopControls = drawerState !== 'fullscreen';
-  const showBottomControls = drawerState === 'peek';
+  // Bottom controls show through peek + expanded (riding the drawer) and hide at
+  // fullscreen. They sit just above the drawer's top edge for each snap state and
+  // glide between them via a CSS transition as the drawer expands/collapses.
+  const showBottomControls = drawerState !== 'fullscreen';
+  const controlsBottom =
+    drawerState === 'expanded' ? frameH * 0.62 + 16 : DRAWER_PEEK_PX + 16;
 
   return (
     <div className="absolute inset-0 overflow-hidden">
@@ -291,10 +297,13 @@ export function MapView() {
           </>
         )}
         {showBottomControls && (
-          <>
-            <RecenterButton onClick={recenter} bottomOffset={DRAWER_PEEK_PX + 16} />
-            <SOSButton bottomOffset={DRAWER_PEEK_PX + 16} />
-          </>
+          <div
+            className="pointer-events-none absolute inset-x-4 flex items-center justify-between transition-[bottom] duration-300 ease-out"
+            style={{ bottom: controlsBottom }}
+          >
+            <RecenterButton onClick={recenter} />
+            <SOSButton />
+          </div>
         )}
       </div>
     </div>

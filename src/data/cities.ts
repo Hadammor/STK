@@ -44,6 +44,50 @@ const telAviv: City = {
   },
   events: [
     {
+      id: 'ta_propal',
+      type: 'protest',
+      severity: 'high',
+      title: 'Pro-Palestine protest',
+      description:
+        'A large pro-Palestine demonstration is assembling at Rabin Square and is expected to march toward Kaplan St. Crowds are building and police are closing surrounding roads.',
+      recommendedAction:
+        'Avoid Rabin Square and Kaplan St. Expect road closures and crowding across the city centre; allow extra time.',
+      source: 'GardaWorld',
+      lat: 32.0853,
+      lng: 34.7818,
+      area: 'Rabin Square',
+      status: 'active',
+      firstReportTime: minsAgo(35),
+      latestUpdateTime: minsAgo(3),
+      unread: true,
+      updates: [
+        { id: 'ta_pp_1', content: 'Crowds gathering at Rabin Square ahead of a planned pro-Palestine march — several hundred so far.', source: 'GardaWorld', timestamp: minsAgo(28), reportedBy: 'system' },
+        { id: 'ta_pp_2', content: 'Crowd now in the thousands. Police closing Ibn Gabirol and the approach to Kaplan St.', source: 'GardaWorld', timestamp: minsAgo(12), reportedBy: 'system' },
+        { id: 'ta_pp_3', content: 'March moving south toward Kaplan St. Heavy congestion; avoid the city-centre core on foot.', source: 'GardaWorld', timestamp: minsAgo(3), reportedBy: 'system' },
+      ],
+    },
+    {
+      id: 'ta_cordon',
+      type: 'security',
+      severity: 'moderate',
+      title: 'Security cordon — Carmel Market',
+      description:
+        'Police have set up a security cordon around the Carmel Market area following a reported suspicious package. Pedestrian access is restricted.',
+      recommendedAction:
+        'Avoid the Carmel Market / Allenby area until the cordon is lifted. Follow officers’ directions.',
+      source: 'GardaWorld',
+      lat: 32.0686,
+      lng: 34.7686,
+      area: 'Carmel Market',
+      status: 'ongoing',
+      firstReportTime: hoursAgo(2),
+      latestUpdateTime: minsAgo(40),
+      unread: true,
+      updates: [
+        { id: 'ta_cd_1', content: 'Security cordon in place around Carmel Market after a suspicious-package report. Bomb squad on scene.', source: 'GardaWorld', timestamp: minsAgo(40), reportedBy: 'system' },
+      ],
+    },
+    {
       id: 'ta_habima',
       type: 'protest',
       severity: 'high',
@@ -77,8 +121,8 @@ const telAviv: City = {
       recommendedAction:
         'Plan for delays tomorrow morning. Avoid underpasses and coastal roads during peak rainfall.',
       source: 'IMS · Israel Meteorological',
-      lat: 32.0853,
-      lng: 34.7818,
+      lat: 32.0843,
+      lng: 34.783,
       area: 'Tel Aviv (citywide)',
       status: 'planned',
       firstReportTime: hoursAgo(2),
@@ -171,6 +215,71 @@ const london: City = {
     hours: 'Mon–Thu · 09:00–16:00',
   },
   events: [
+    {
+      id: 'ldn_propal',
+      type: 'protest',
+      severity: 'high',
+      title: 'Pro-Palestine march',
+      description:
+        'A large pro-Palestine march is forming around Whitehall and is expected to move toward Trafalgar Square. Crowds are building and the Met is closing surrounding roads.',
+      recommendedAction:
+        'Avoid Whitehall and Trafalgar Square. Expect road closures and bus diversions across the centre; allow extra time.',
+      source: 'GardaWorld',
+      lat: 51.5138,
+      lng: -0.1288,
+      area: 'Whitehall → Trafalgar Sq',
+      status: 'active',
+      firstReportTime: minsAgo(35),
+      latestUpdateTime: minsAgo(2),
+      unread: true,
+      updates: [
+        { id: 'ldn_pp_1', content: 'Marchers assembling along Whitehall for a planned pro-Palestine demonstration — several hundred so far.', source: 'GardaWorld', timestamp: minsAgo(28), reportedBy: 'system' },
+        { id: 'ldn_pp_2', content: 'Crowd now in the thousands. Met Police closing Whitehall and the approach to Trafalgar Square.', source: 'Met Police feed', timestamp: minsAgo(12), reportedBy: 'operator' },
+        { id: 'ldn_pp_3', content: 'March moving toward Trafalgar Square. Heavy congestion; avoid the area on foot and expect bus diversions.', source: 'GardaWorld', timestamp: minsAgo(2), reportedBy: 'system' },
+      ],
+    },
+    {
+      id: 'ldn_cordon',
+      type: 'security',
+      severity: 'moderate',
+      title: 'Security cordon — Embankment',
+      description:
+        'A police security cordon is in place near Embankment after a reported unattended bag. Some riverside footpaths are closed.',
+      recommendedAction:
+        'Avoid Victoria Embankment between Westminster and Temple until cleared. Follow officers’ directions.',
+      source: 'GardaWorld',
+      lat: 51.5075,
+      lng: -0.1205,
+      area: 'Embankment',
+      status: 'ongoing',
+      firstReportTime: hoursAgo(2),
+      latestUpdateTime: minsAgo(45),
+      unread: false,
+      updates: [
+        { id: 'ldn_cd_1', content: 'Security cordon near Embankment after an unattended-bag report. Officers on scene; expect short delays.', source: 'GardaWorld', timestamp: minsAgo(45), reportedBy: 'system' },
+      ],
+    },
+    {
+      id: 'ldn_eliz',
+      type: 'transit',
+      severity: 'low',
+      title: 'Elizabeth line — minor delays',
+      description:
+        'Minor delays on the Elizabeth line through the central section after an earlier signalling fault near Farringdon.',
+      recommendedAction:
+        'Allow a little extra time, or use the Underground as an alternative.',
+      source: 'TfL',
+      lat: 51.5203,
+      lng: -0.105,
+      area: 'Farringdon',
+      status: 'ongoing',
+      firstReportTime: hoursAgo(4),
+      latestUpdateTime: hoursAgo(4),
+      unread: false,
+      updates: [
+        { id: 'ldn_el_1', content: 'Minor delays on the Elizabeth line through the centre after a signalling fault near Farringdon.', source: 'TfL', timestamp: hoursAgo(4), reportedBy: 'system' },
+      ],
+    },
     {
       id: 'ldn_parliament',
       type: 'protest',
@@ -299,6 +408,50 @@ const bangkok: City = {
     hours: 'Mon–Fri · 08:00–16:00',
   },
   events: [
+    {
+      id: 'bkk_propal',
+      type: 'protest',
+      severity: 'high',
+      title: 'Pro-Palestine protest',
+      description:
+        'A pro-Palestine demonstration is gathering at the Ratchaprasong intersection near the malls. Crowds are building and police are managing road closures.',
+      recommendedAction:
+        'Avoid the Ratchaprasong / Siam area. Expect road closures and BTS crowding; allow extra time.',
+      source: 'GardaWorld',
+      lat: 13.745,
+      lng: 100.515,
+      area: 'Ratchaprasong',
+      status: 'active',
+      firstReportTime: minsAgo(35),
+      latestUpdateTime: minsAgo(4),
+      unread: true,
+      updates: [
+        { id: 'bkk_pp_1', content: 'Crowds gathering at Ratchaprasong for a pro-Palestine demonstration — several hundred so far.', source: 'GardaWorld', timestamp: minsAgo(26), reportedBy: 'system' },
+        { id: 'bkk_pp_2', content: 'Crowd growing into the thousands. Police closing lanes around the Ratchadamri intersection.', source: 'GardaWorld', timestamp: minsAgo(11), reportedBy: 'system' },
+        { id: 'bkk_pp_3', content: 'Situation crowded but calm. Avoid Ratchaprasong on foot; BTS stations are busy.', source: 'GardaWorld', timestamp: minsAgo(4), reportedBy: 'system' },
+      ],
+    },
+    {
+      id: 'bkk_cordon',
+      type: 'security',
+      severity: 'moderate',
+      title: 'Security check — Sukhumvit',
+      description:
+        'Increased police presence and vehicle checks along lower Sukhumvit Rd this evening. Expect slow traffic and occasional stops.',
+      recommendedAction:
+        'Allow extra time along Sukhumvit and carry ID. Follow officers’ directions at checkpoints.',
+      source: 'GardaWorld',
+      lat: 13.738,
+      lng: 100.541,
+      area: 'Sukhumvit',
+      status: 'ongoing',
+      firstReportTime: hoursAgo(2),
+      latestUpdateTime: minsAgo(50),
+      unread: false,
+      updates: [
+        { id: 'bkk_cd_1', content: 'Increased checks along lower Sukhumvit this evening. Expect slow traffic and occasional stops.', source: 'GardaWorld', timestamp: minsAgo(50), reportedBy: 'system' },
+      ],
+    },
     {
       id: 'bkk_democracy',
       type: 'protest',

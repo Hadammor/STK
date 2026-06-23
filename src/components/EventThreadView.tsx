@@ -72,7 +72,7 @@ function RichCard({
         <button
           type="button"
           onClick={onShowOnMap}
-          className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-md border border-hair bg-white py-2.5 text-body font-semibold text-ink transition-transform active:scale-[0.99] active:bg-surface"
+          className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-md bg-ink py-2.5 text-body font-semibold text-white transition-transform active:scale-[0.99] active:opacity-90"
         >
           <MapPin size={16} /> Show on map
         </button>
