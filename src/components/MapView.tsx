@@ -13,7 +13,6 @@ import {
 } from '../styles/tokens';
 import type { Event } from '../types/Event';
 import type { City } from '../data/cities';
-import { StatusBar } from './StatusBar';
 import { SearchBar } from './SearchBar';
 import { StatusPill } from './StatusPill';
 import { ProfileButton } from './ProfileButton';
@@ -272,13 +271,12 @@ export function MapView() {
 
       {/* Floating chrome over the map */}
       <div className="pointer-events-none absolute inset-0 z-20">
-        <StatusBar />
         {showTopControls && (
           <>
-            {/* search bar + profile — pushed below the device/browser top chrome */}
+            {/* search bar + profile — at the top, below the notch / browser chrome */}
             <div
               className="absolute inset-x-3 flex items-center gap-2.5"
-              style={{ top: 'calc(env(safe-area-inset-top) + 78px)' }}
+              style={{ top: 'calc(env(safe-area-inset-top) + 12px)' }}
             >
               <SearchBar />
               <ProfileButton />
@@ -286,7 +284,7 @@ export function MapView() {
             {/* status pill */}
             <div
               className="absolute left-0 right-0 flex justify-center"
-              style={{ top: 'calc(env(safe-area-inset-top) + 134px)' }}
+              style={{ top: 'calc(env(safe-area-inset-top) + 68px)' }}
             >
               <StatusPill />
             </div>
