@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Global resets ---- */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Neutral page backdrop behind the phone frame */
+  background: #e7e7ea;
+  color: #000000;
+}
+
+/* The demo is a mobile frame viewed in a desktop browser. */
+#root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hide scrollbars inside the drawer / sheets — keep the surfaces clean. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* No drop shadows anywhere — separation is border + surface only (per design system). */
+
+/* Mapbox marker + control tweaks so our custom markers sit cleanly. */
+.mapboxgl-marker {
+  cursor: pointer;
+  will-change: transform;
+}
+.mapboxgl-ctrl-logo,
+.mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-attrib {
+  opacity: 0.5;
+}
