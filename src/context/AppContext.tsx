@@ -75,6 +75,11 @@ interface AppContextValue {
   sosOpen: boolean;
   openSOS: () => void;
   closeSOS: () => void;
+
+  // Simulated phone call (from the SOS slide-to-call)
+  callActive: boolean;
+  startCall: () => void;
+  endCall: () => void;
   settingsOpen: boolean;
   openSettings: () => void;
   closeSettings: () => void;
@@ -120,6 +125,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
+
+  const [callActive, setCallActive] = useState(false);
+  const startCall = useCallback(() => setCallActive(true), []);
+  const endCall = useCallback(() => setCallActive(false), []);
 
   const drawer = useDrawer('peek');
   const sos = useSheet(false);
@@ -224,6 +233,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     sosOpen: sos.isOpen,
     openSOS: sos.open,
     closeSOS: sos.close,
+    callActive,
+    startCall,
+    endCall,
     settingsOpen: settings.isOpen,
     openSettings: settings.open,
     closeSettings: settings.close,

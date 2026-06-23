@@ -7,13 +7,21 @@ import { SOSSheet } from './components/SOSSheet';
 import { SettingsSheet } from './components/SettingsSheet';
 import { ConfirmModal } from './components/ConfirmModal';
 import { Toast } from './components/Toast';
+import { CallScreen } from './components/CallScreen';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Full-screen app frame: fills the browser viewport height (so nothing gets
 // cut off), mobile-capped width, centered.
 function Shell() {
-  const { openThreadEventId, getEvent, closeThread, confirm, closeConfirm } =
-    useApp();
+  const {
+    openThreadEventId,
+    getEvent,
+    closeThread,
+    confirm,
+    closeConfirm,
+    callActive,
+    endCall,
+  } = useApp();
   const threadEvent = openThreadEventId ? getEvent(openThreadEventId) : undefined;
 
   return (
@@ -50,6 +58,11 @@ function Shell() {
       />
 
       <Toast />
+
+      {/* Simulated iOS call screen (from the SOS slide-to-call) */}
+      <AnimatePresence>
+        {callActive && <CallScreen onEnd={endCall} />}
+      </AnimatePresence>
     </div>
   );
 }

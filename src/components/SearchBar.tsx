@@ -25,7 +25,7 @@ export function SearchBar() {
   return (
     <div className="pointer-events-auto relative flex-1">
       {open ? (
-        <div className="flex h-11 w-full items-center gap-2.5 rounded-pill border border-hair bg-white px-4">
+        <div className="flex h-11 w-full items-center gap-2.5 rounded-pill border border-hair bg-white px-4 shadow-[0_4px_14px_rgba(0,0,0,0.10)]">
           <Search size={18} className="shrink-0 text-ink3" />
           <input
             autoFocus
@@ -48,7 +48,7 @@ export function SearchBar() {
           type="button"
           aria-label="Search address or city"
           onClick={() => setOpen(true)}
-          className="flex h-11 w-full items-center gap-2.5 rounded-pill border border-hair bg-white px-4 text-left transition-transform active:scale-[0.99]"
+          className="flex h-11 w-full items-center gap-2.5 rounded-pill border border-hair bg-white px-4 text-left shadow-[0_4px_14px_rgba(0,0,0,0.10)] transition-transform active:scale-[0.99]"
         >
           <Search size={18} className="text-ink3" />
           <span className="truncate text-body text-ink3">

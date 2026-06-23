@@ -1,8 +1,9 @@
 import { Navigation } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { accent } from '../styles/tokens';
+import { PulseDot } from './PulseDot';
 
-// Top-center trust signal: solid-green "Active" pill with a location arrow + live dot.
+// Top-center trust signal: dark "Active" pill with a location arrow + live pulse.
 // Tappable but a no-op for the demo.
 export function StatusPill() {
   const { showToast } = useApp();
@@ -10,12 +11,12 @@ export function StatusPill() {
     <button
       type="button"
       onClick={() => showToast('Status: Active — demo')}
-      className="pointer-events-auto flex items-center gap-2 rounded-pill px-3.5 py-2 text-caption font-semibold text-white transition-transform active:scale-95"
+      className="pointer-events-auto flex items-center gap-1.5 rounded-pill py-2 pl-3.5 pr-2 text-caption font-semibold text-white transition-transform active:scale-95"
       style={{ backgroundColor: accent.active }}
     >
       <Navigation size={14} fill="currentColor" strokeWidth={0} />
       Active
-      <span className="h-1.5 w-1.5 rounded-full bg-white" />
+      <PulseDot size={20} />
     </button>
   );
 }

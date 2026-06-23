@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Shield,
   Ambulance,
@@ -6,7 +5,6 @@ import {
   MapPin,
   Phone,
   Clock,
-  Check,
   type LucideIcon,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -31,14 +29,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export function SOSSheet() {
-  const { sosOpen, closeSOS, requestConfirm, city } = useApp();
-  const [helpRequested, setHelpRequested] = useState(false);
-
-  // Reset the hero state on every close path (X, backdrop, drag-down).
-  function handleClose() {
-    setHelpRequested(false);
-    closeSOS();
-  }
+  const { sosOpen, closeSOS, requestConfirm, city, callActive, startCall } =
+    useApp();
 
   function handleCall(service: EmergencyService) {
     requestConfirm({
@@ -52,21 +44,15 @@ export function SOSSheet() {
   }
 
   return (
-    <BottomSheet open={sosOpen} onClose={handleClose} heightPct={0.72} title="Emergency">
-      {/* Hero — slide to call (deliberate; avoids accidental taps) */}
-      {helpRequested ? (
-        <div className="flex h-[60px] w-full items-center justify-center gap-2 rounded-2xl border border-hair bg-surface px-4 text-center">
-          <Check size={20} className="text-ink" />
-          <span className="text-body font-semibold text-ink">
-            Calling… help is aware. Stay where you are if safe.
-          </span>
-        </div>
-      ) : (
+    <BottomSheet open={sosOpen} onClose={closeSOS} heightPct={0.72} title="Emergency">
+      {/* Hero — slide to call (deliberate; avoids accidental taps).
+          Unmounted while a call is active so the slider resets when you return. */}
+      {!callActive && (
         <>
           <SlideToConfirm
             label="Call for help"
             color={accent.sos}
-            onConfirm={() => setHelpRequested(true)}
+            onConfirm={startCall}
           />
           <p className="mt-2 text-caption text-ink2">
             Slide to call. Shares your location with GardaWorld Security.
